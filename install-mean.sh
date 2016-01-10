@@ -76,8 +76,7 @@ node:
   links:
     - base
   ports:
-    - "8080:80"
-    - "8081:443"
+    - "3000:3000"
   volumes_from:
     - base
     - mongodb
