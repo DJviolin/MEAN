@@ -50,7 +50,7 @@ cadvisor:
   image: google/cadvisor:latest
   container_name: mean_cadvisor
   ports:
-    - "8082:8080"
+    - "8080:8080"
   volumes:
     - "/:/rootfs:ro"
     - "/var/run:/var/run:rw"
