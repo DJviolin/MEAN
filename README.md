@@ -78,3 +78,8 @@ $ chmod +x $HOME/bin/docker-compose
 # Reloading .bashrc without opening a new bash instance
 $ source $HOME/.bashrc
 ```
+
+## Notes
+
+Future work: https://github.com/jwilder/nginx-proxy
+
