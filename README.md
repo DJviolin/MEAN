@@ -81,5 +81,8 @@ $ source $HOME/.bashrc
 
 ## Notes
 
-Future work: https://github.com/jwilder/nginx-proxy
+Future implementation:
 
+https://github.com/jwilder/nginx-proxy
+
+https://hub.docker.com/r/knickers/mongo-express/
