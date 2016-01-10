@@ -7,9 +7,9 @@ read -e -p "Enter the path to the install dir (or hit enter for default path): "
 echo $INSTALL_DIR
 
 echo -e "\nCreating folder structure:"
-mkdir -p $INSTALL_DIR/mongodb $INSTALL_DIR/dbbackup $INSTALL_DIR/mean $INSTALL_DIR/www
+mkdir -p $INSTALL_DIR/mongodb/data/db $INSTALL_DIR/dbbackup $INSTALL_DIR/mean $INSTALL_DIR/www
 echo -e "\
-  $INSTALL_DIR/mongodb\n\
+  $INSTALL_DIR/mongodb/data/db\n\
   $INSTALL_DIR/dbbackup\n\
   $INSTALL_DIR/mean\n\
   $INSTALL_DIR/www\n\
@@ -69,7 +69,7 @@ mongodb:
   ports:
     - "27017:27017"
   volumes:
-    - /data/db
+    - $INSTALL_DIR/mongodb/data/db:/data/db
 node:
   build: ./node
   container_name: mean_node
