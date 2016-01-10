@@ -1,3 +1,3 @@
 #!/bin/bash
 
-fleetctl submit ./lemp.service && fleetctl start lemp.service; fleetctl journal -follow=true -lines=50 lemp
+fleetctl submit ./mean.service && fleetctl start mean.service; fleetctl journal -follow=true -lines=50 mean

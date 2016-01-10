@@ -1,3 +1,3 @@
 #!/bin/bash
 
-fleetctl stop lemp.service; echo "Now sleeping for 60 seconds..."; sleep 60; fleetctl unload lemp.service; fleetctl destroy lemp.service
+fleetctl stop mean.service; echo "Now sleeping for 60 seconds..."; sleep 60; fleetctl unload mean.service; fleetctl destroy mean.service
