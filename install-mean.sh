@@ -73,9 +73,6 @@ node:
   container_name: mean_node_exited
   links:
     - base
-  volumes_from:
-    - base
-    - mongodb
 app:
   build: ./app
   container_name: mean_app
@@ -85,8 +82,6 @@ app:
     - "3000:3000"
   volumes:
     - $INSTALL_DIR/www:/usr/src/app:rw
-  volumes_from:
-    - node
 EOF
 cat $INSTALL_DIR/mean/docker-compose.yml
 
