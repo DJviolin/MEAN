@@ -58,9 +58,7 @@ cadvisor:
     - "/var/lib/docker/:/var/lib/docker:ro"
 base:
   build: ./base
-  container_name: mean_base
-  volumes:
-  - $INSTALL_DIR/www/:/var/www/:rw
+  container_name: mean_base_exited
 mongodb:
   build: ./mongodb
   container_name: mean_mongodb
@@ -72,14 +70,23 @@ mongodb:
     - $INSTALL_DIR/mongodb/data/db:/data/db
 node:
   build: ./node
-  container_name: mean_node
+  container_name: mean_node_exited
+  links:
+    - base
+  volumes_from:
+    - base
+    - mongodb
+app:
+  build: ./app
+  container_name: mean_app
   links:
     - base
   ports:
     - "3000:3000"
+  volumes:
+    - $INSTALL_DIR/www:/usr/src/app:rw
   volumes_from:
-    - base
-    - mongodb
+    - node
 EOF
 cat $INSTALL_DIR/mean/docker-compose.yml
 

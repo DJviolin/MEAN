@@ -30,11 +30,6 @@ root            soft    nofile            500000" >> /etc/security/limits.conf \
     && echo -e "fs.file-max = 2097152" >> /etc/sysctl.conf
 ### End of optimizations
 
-### Start of WEBSERVER setup
-RUN mkdir -p /var/www
-### End of WEBSERVER setup
-
 RUN rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["/bin/bash", "-c"]
-CMD ["tail", "-f", "/dev/null"]

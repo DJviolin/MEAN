@@ -4,7 +4,7 @@
 
 FROM mean_base:latest
 MAINTAINER Istvan Lantos <info@lantosistvan.com>
-LABEL Description="Node.js" Vendor="Istvan Lantos" Version="1.0"
+LABEL Description="Node.js Base" Vendor="Istvan Lantos" Version="1.0"
 
 # buildpack-deps/jessie-curl
 RUN apt-get -y update && apt-get -y dist-upgrade \
