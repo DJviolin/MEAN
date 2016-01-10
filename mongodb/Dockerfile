@@ -62,7 +62,5 @@ RUN mkdir -p /data/db && chown -R mongodb:mongodb /data/db
 COPY docker-entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
-RUN rm -rf /var/lib/apt/lists/*
-
 #EXPOSE 27017
 CMD ["mongod"]
