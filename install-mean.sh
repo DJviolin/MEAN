@@ -5,15 +5,18 @@ set -e
 
 read -e -p "Enter the path to the install dir (or hit enter for default path): " -i "$HOME/server-mean" INSTALL_DIR
 echo $INSTALL_DIR
+DB_DIR=$INSTALL_DIR/mongodb
+DBBAK_DIR=$INSTALL_DIR/dbbackup
 REPO_DIR=$INSTALL_DIR/repo
+WWW_DIR=$INSTALL_DIR/www
 
 echo -e "\nCreating folder structure:"
-mkdir -p $INSTALL_DIR/mongodb/data/db $INSTALL_DIR/dbbackup $REPO_DIR $INSTALL_DIR/www
+mkdir -p $DB_DIR/data/db $DBBAK_DIR $REPO_DIR $WWW_DIR
 echo -e "\
-  $INSTALL_DIR/mongodb/data/db\n\
-  $INSTALL_DIR/dbbackup\n\
+  $DB_DIR/data/db\n\
+  $DBBAK_DIR\n\
   $REPO_DIR\n\
-  $INSTALL_DIR/www\n\
+  $WWW_DIR\n\
 Done!"
 
 if test "$(ls -A "$REPO_DIR")"; then
@@ -68,7 +71,7 @@ mongodb:
   ports:
     - "27017:27017"
   volumes:
-    - $INSTALL_DIR/mongodb/data/db:/data/db
+    - $DB_DIR/data/db:/data/db
 node:
   build: ./node
   container_name: mean_node_exited
@@ -82,7 +85,7 @@ app:
   ports:
     - "3000:3000"
   volumes:
-    - $INSTALL_DIR/www:/usr/src/app:rw
+    - $WWW_DIR:/usr/src/app:rw
 EOF
 cat $REPO_DIR/docker-compose.yml
 
@@ -97,16 +100,16 @@ Requires=docker.service
 [Service]
 TimeoutStartSec=0
 #KillMode=none
-ExecStartPre=-/usr/bin/docker cp mean_mongodb:/data $INSTALL_DIR/dbbackup
-ExecStartPre=-/bin/bash -c '/usr/bin/tar -zcvf $INSTALL_DIR/dbbackup/dbbackup_\$\$(date +%%Y-%%m-%%d_%%H-%%M-%%S)_ExecStartPre.tar.gz $INSTALL_DIR/dbbackup/mongodb --remove-files'
+ExecStartPre=-/usr/bin/docker cp mean_mongodb:/data $DBBAK_DIR
+ExecStartPre=-/bin/bash -c '/usr/bin/tar -zcvf $DBBAK_DIR/dbbackup_\$\$(date +%%Y-%%m-%%d_%%H-%%M-%%S)_ExecStartPre.tar.gz $DBBAK_DIR/mongodb --remove-files'
 ExecStartPre=-/opt/bin/docker-compose --file $REPO_DIR/docker-compose.yml kill
 ExecStartPre=-/opt/bin/docker-compose --file $REPO_DIR/docker-compose.yml rm --force
 ExecStart=/opt/bin/docker-compose --file $REPO_DIR/docker-compose.yml up --force-recreate
 ExecStartPost=/usr/bin/etcdctl set /mean Running
 ExecStop=/opt/bin/docker-compose --file $REPO_DIR/docker-compose.yml stop
 ExecStopPost=/usr/bin/etcdctl rm /mean
-ExecStopPost=-/usr/bin/docker cp mean_mongodb:/data $INSTALL_DIR/dbbackup
-ExecStopPost=-/bin/bash -c 'tar -zcvf $INSTALL_DIR/dbbackup/dbbackup_\$\$(date +%%Y-%%m-%%d_%%H-%%M-%%S)_ExecStopPost.tar.gz $INSTALL_DIR/dbbackup/mongodb --remove-files'
+ExecStopPost=-/usr/bin/docker cp mean_mongodb:/data $DBBAK_DIR
+ExecStopPost=-/bin/bash -c 'tar -zcvf $DBBAK_DIR/dbbackup_\$\$(date +%%Y-%%m-%%d_%%H-%%M-%%S)_ExecStopPost.tar.gz $DBBAK_DIR/mongodb --remove-files'
 Restart=always
 #RestartSec=30s
 
