@@ -82,6 +82,7 @@ app:
   container_name: mean_app
   links:
     - base
+    - node
   ports:
     - "3000:3000"
   volumes:
