@@ -31,13 +31,13 @@ The script will create the `docker-compose.yml` and `mean.service` files inside 
 Run docker-compose with:
 
 ```
-$ docker-compose --file $HOME/server/mean/docker-compose.yml build
+$ docker-compose --file $HOME/server-mean/mean/docker-compose.yml build
 ```
 
 Start the Systemd service:
 
 ```
-$ cd $HOME/server/mean
+$ cd $HOME/server-mean/mean
 $ chmod +x service-start.sh
 $ ./service-start.sh
 ```
@@ -45,7 +45,7 @@ $ ./service-start.sh
 Stop the systemd service:
 
 ```
-$ cd $HOME/server/mean
+$ cd $HOME/server-mean/mean
 $ chmod +x service-stop.sh
 $ ./service-stop.sh
 ```
