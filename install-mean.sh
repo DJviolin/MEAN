@@ -7,7 +7,7 @@ read -e -p "Enter the path to the install dir (or hit enter for default path): "
 echo $INSTALL_DIR
 DB_DIR=$INSTALL_DIR/mongodb
 DBBAK_DIR=$INSTALL_DIR/dbbackup
-REPO_DIR=$INSTALL_DIR/repo
+REPO_DIR=$INSTALL_DIR/mean
 WWW_DIR=$INSTALL_DIR/www
 
 echo -e "\nCreating folder structure:"
