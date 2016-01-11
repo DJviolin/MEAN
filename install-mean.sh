@@ -5,37 +5,38 @@ set -e
 
 read -e -p "Enter the path to the install dir (or hit enter for default path): " -i "$HOME/server-mean" INSTALL_DIR
 echo $INSTALL_DIR
+REPO_DIR=$INSTALL_DIR/repo
 
 echo -e "\nCreating folder structure:"
-mkdir -p $INSTALL_DIR/mongodb/data/db $INSTALL_DIR/dbbackup $INSTALL_DIR/repo $INSTALL_DIR/www
+mkdir -p $INSTALL_DIR/mongodb/data/db $INSTALL_DIR/dbbackup $REPO_DIR $INSTALL_DIR/www
 echo -e "\
   $INSTALL_DIR/mongodb/data/db\n\
   $INSTALL_DIR/dbbackup\n\
-  $INSTALL_DIR/repo\n\
+  $REPO_DIR\n\
   $INSTALL_DIR/www\n\
 Done!"
 
-if test "$(ls -A "$INSTALL_DIR/repo")"; then
-  echo -e "\n\"$INSTALL_DIR/repo\" directory is not empty!\nYou have to remove everything from here to continue!\nRemove \"$INSTALL_DIR/repo\" directory (y/n)?"
+if test "$(ls -A "$REPO_DIR")"; then
+  echo -e "\n\"$REPO_DIR\" directory is not empty!\nYou have to remove everything from here to continue!\nRemove \"$REPO_DIR\" directory (y/n)?"
   read answer
   if echo "$answer" | grep -iq "^y" ;then
-    rm -rf $INSTALL_DIR/repo/
-    echo -e "\"$INSTALL_DIR/repo\" is removed, continue installation...";
-    mkdir -p $INSTALL_DIR/repo
-    echo -e "\nCloning git repo into \"$INSTALL_DIR/repo\":"
-    cd $INSTALL_DIR/repo
-    git clone https://github.com/DJviolin/mean.git $INSTALL_DIR/repo
+    rm -rf $REPO_DIR/
+    echo -e "\"$REPO_DIR\" is removed, continue installation...";
+    mkdir -p $REPO_DIR
+    echo -e "\nCloning git repo into \"$REPO_DIR\":"
+    cd $REPO_DIR
+    git clone https://github.com/DJviolin/mean.git $REPO_DIR
     echo -e "\nShowing working directory..."
-    ls -al $INSTALL_DIR/repo
+    ls -al $REPO_DIR
   else
     echo -e "\nScript aborted to run\nExiting..."; exit 1;
   fi
 else
-  echo -e "\nCloning git repo into \"$INSTALL_DIR/repo\":"
-  cd $INSTALL_DIR/repo
-  git clone https://github.com/DJviolin/mean.git $INSTALL_DIR/repo
+  echo -e "\nCloning git repo into \"$REPO_DIR\":"
+  cd $REPO_DIR
+  git clone https://github.com/DJviolin/mean.git $REPO_DIR
   echo -e "Showing working directory..."
-  ls -al $INSTALL_DIR/repo
+  ls -al $REPO_DIR
 fi
 
 echo -e "\nCreating additional files for the stack:"
@@ -44,8 +45,8 @@ echo -e "\nCreating additional files for the stack:"
 # http://stackoverflow.com/questions/4937792/using-variables-inside-a-bash-heredoc
 # http://stackoverflow.com/questions/17578073/ssh-and-environment-variables-remote-and-local
 
-echo -e "\nCreating: $INSTALL_DIR/repo/docker-compose.yml\n"
-cat <<EOF > $INSTALL_DIR/repo/docker-compose.yml
+echo -e "\nCreating: $REPO_DIR/docker-compose.yml\n"
+cat <<EOF > $REPO_DIR/docker-compose.yml
 cadvisor:
   image: google/cadvisor:latest
   container_name: mean_cadvisor
@@ -83,10 +84,10 @@ app:
   volumes:
     - $INSTALL_DIR/www:/usr/src/app:rw
 EOF
-cat $INSTALL_DIR/repo/docker-compose.yml
+cat $REPO_DIR/docker-compose.yml
 
-echo -e "\nCreating: $INSTALL_DIR/repo/mean.service\n"
-cat <<EOF > $INSTALL_DIR/repo/mean.service
+echo -e "\nCreating: $REPO_DIR/mean.service\n"
+cat <<EOF > $REPO_DIR/mean.service
 [Unit]
 Description=mean
 After=etcd.service
@@ -98,11 +99,11 @@ TimeoutStartSec=0
 #KillMode=none
 ExecStartPre=-/usr/bin/docker cp mean_mongodb:/data $INSTALL_DIR/dbbackup
 ExecStartPre=-/bin/bash -c '/usr/bin/tar -zcvf $INSTALL_DIR/dbbackup/dbbackup_\$\$(date +%%Y-%%m-%%d_%%H-%%M-%%S)_ExecStartPre.tar.gz $INSTALL_DIR/dbbackup/mongodb --remove-files'
-ExecStartPre=-/opt/bin/docker-compose --file $INSTALL_DIR/repo/docker-compose.yml kill
-ExecStartPre=-/opt/bin/docker-compose --file $INSTALL_DIR/repo/docker-compose.yml rm --force
-ExecStart=/opt/bin/docker-compose --file $INSTALL_DIR/repo/docker-compose.yml up --force-recreate
+ExecStartPre=-/opt/bin/docker-compose --file $REPO_DIR/docker-compose.yml kill
+ExecStartPre=-/opt/bin/docker-compose --file $REPO_DIR/docker-compose.yml rm --force
+ExecStart=/opt/bin/docker-compose --file $REPO_DIR/docker-compose.yml up --force-recreate
 ExecStartPost=/usr/bin/etcdctl set /mean Running
-ExecStop=/opt/bin/docker-compose --file $INSTALL_DIR/repo/docker-compose.yml stop
+ExecStop=/opt/bin/docker-compose --file $REPO_DIR/docker-compose.yml stop
 ExecStopPost=/usr/bin/etcdctl rm /mean
 ExecStopPost=-/usr/bin/docker cp mean_mongodb:/data $INSTALL_DIR/dbbackup
 ExecStopPost=-/bin/bash -c 'tar -zcvf $INSTALL_DIR/dbbackup/dbbackup_\$\$(date +%%Y-%%m-%%d_%%H-%%M-%%S)_ExecStopPost.tar.gz $INSTALL_DIR/dbbackup/mongodb --remove-files'
@@ -112,16 +113,16 @@ Restart=always
 [X-Fleet]
 Conflicts=mean.service
 EOF
-cat $INSTALL_DIR/repo/mean.service
+cat $REPO_DIR/mean.service
 
 cd $HOME
 
 echo -e "\n
 MEAN stack has successfully built!\n\n\
 Run docker-compose with:\n\
-  $ docker-compose --file $INSTALL_DIR/repo/docker-compose.yml build\n\
+  $ docker-compose --file $REPO_DIR/docker-compose.yml build\n\
 Run the systemd service with:\n\
-  $ cd $INSTALL_DIR/repo && chmod +x service-start.sh && ./service-start.sh\n\
+  $ cd $REPO_DIR && chmod +x service-start.sh && ./service-start.sh\n\
 Stop the systemd service with:\n\
-  $ cd $INSTALL_DIR/repo && chmod +x service-stop.sh && ./service-stop.sh"
+  $ cd $REPO_DIR && chmod +x service-stop.sh && ./service-stop.sh"
 echo -e "\nAll done! Exiting..."
