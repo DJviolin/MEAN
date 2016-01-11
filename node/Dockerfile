@@ -39,4 +39,4 @@ RUN rm -rf /var/lib/apt/lists/*
 
 RUN node -v && npm -v
 
-CMD ["node"]
+#CMD ["node"]
